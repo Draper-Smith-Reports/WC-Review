@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workers' Comp Review – Draper Smith Insurance Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  NTFY.SH SETUP — 3 minutes, no account, no email server        ║
+  ║                                                                  ║
+  ║  1. Install the ntfy app on your phone:                         ║
+  ║       iOS  → App Store → search "ntfy"                          ║
+  ║       Android → Play Store → search "ntfy"                      ║
+  ║                                                                  ║
+  ║  2. Choose a topic name — make it unguessable, like:            ║
+  ║       ds-daniel-wc-7492                                         ║
+  ║     (anyone who knows the topic can send to it, so don't        ║
+  ║      use something obvious like your name)                      ║
+  ║                                                                  ║
+  ║  3. In the ntfy app: tap + → enter your topic name → Subscribe  ║
+  ║                                                                  ║
+  ║  4. Replace NTFY_TOPIC below with your chosen topic name        ║
+  ║                                                                  ║
+  ║  That's it. No passwords, no email, no company IT involved.     ║
+  ╚══════════════════════════════════════════════════════════════════╝
+-->
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ch:    #1c2130;
+    --ch2:   #232a3b;
+    --ch3:   #2d3650;
+    --ch4:   #38415c;
+    --white: #eef1f8;
+    --muted: #7d8aa3;
+    --ta:    #3d6b9e;
+    --ta2:   #5189c4;
+    --tglow: rgba(61,107,158,.22);
+    --tbg:   rgba(61,107,158,.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--ch);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(61,107,158,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(61,107,158,.05) 1px, transparent 1px);
+    background-size: 52px 52px;
+    animation: gd 50s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes gd { to { background-position: 52px 52px; } }
+
+  .page { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding-bottom: 80px; }
+
+  /* ── Topbar ────────────────────────────────────────────────── */
+  .topbar {
+    background: #111724;
+    border-bottom: 2px solid var(--ta);
+    padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px; gap: 16px;
+    opacity: 0; animation: fadeUp .45s ease forwards .05s;
+  }
+  .topbar-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .topbar-logo img { height: 34px; width: auto; }
+  .logo-fb { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 18px; letter-spacing: .04em; text-transform: uppercase; color: var(--white); display: none; }
+  .topbar-right { display: flex; align-items: center; gap: 18px; }
+  .topbar-phone { font-size: 15px; font-weight: 600; color: var(--ta2); text-decoration: none; white-space: nowrap; }
+  .topbar-phone:hover { color: var(--white); }
+  .topbar-cta {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--ch);
+    background: var(--ta2); padding: 8px 16px; border-radius: 5px; text-decoration: none;
+    transition: background .15s; white-space: nowrap;
+  }
+  .topbar-cta:hover { background: var(--white); }
+
+  /* ── Hero ──────────────────────────────────────────────────── */
+  .hero { padding: 44px 28px 36px; border-bottom: 1px solid var(--ch3); }
+
+  .tier-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--tbg); border: 1px solid var(--ta); border-radius: 4px;
+    padding: 5px 14px; font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--ta2); margin-bottom: 20px;
+    opacity: 0; animation: fadeUp .5s ease forwards .18s;
+  }
+  .tier-badge::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ta2); box-shadow: 0 0 6px var(--ta2);
+    animation: pulse 2s ease infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+  .prospect-label {
+    font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+    opacity: 0; animation: fadeUp .5s ease forwards .28s;
+  }
+
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: clamp(36px, 6.5vw, 62px); line-height: 1; letter-spacing: -.01em;
+    text-transform: uppercase; margin-bottom: 14px;
+    opacity: 0; animation: fadeUp .5s ease forwards .38s;
+  }
+  h1 em { font-style: normal; color: var(--ta2); }
+
+  .subhead {
+    font-size: clamp(14px, 2.2vw, 17px); font-weight: 300; color: #9aa5bc; line-height: 1.65; max-width: 580px;
+    opacity: 0; animation: fadeUp .5s ease forwards .48s;
+  }
+
+  /* ── Content ───────────────────────────────────────────────── */
+  .content { padding: 34px 28px 0; }
+
+  /* ── X-mod summary row ─────────────────────────────────────── */
+  .xmod-summary {
+    display: flex; align-items: stretch; gap: 16px; margin-bottom: 28px; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp .5s ease forwards .56s;
+  }
+  .xmod-card {
+    flex: 0 0 auto; min-width: 130px;
+    background: var(--ch2); border: 1px solid var(--ch3); border-top: 3px solid var(--ta);
+    border-radius: 10px; padding: 20px 26px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 6px 28px rgba(0,0,0,.28);
+  }
+  .xmod-lbl { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .xmod-num { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 52px; line-height: 1; color: var(--ta2); letter-spacing: -2px; }
+  .xmod-ctx { font-size: 10px; color: var(--muted); margin-top: 5px; text-align: center; line-height: 1.3; }
+  .xmod-meaning {
+    flex: 1 1 260px; background: var(--ch2); border: 1px solid var(--ch3); border-radius: 10px;
+    padding: 20px 22px; font-size: 14px; line-height: 1.7; color: #9aa5bc;
+    box-shadow: 0 6px 28px rgba(0,0,0,.28);
+  }
+  .xmod-meaning strong { color: var(--white); font-weight: 600; }
+
+  /* ── Peer comparison chart ─────────────────────────────────── */
+  .chart-section {
+    background: var(--ch2); border: 1px solid var(--ch3); border-radius: 12px;
+    padding: 24px 24px 20px; margin-bottom: 28px;
+    box-shadow: 0 6px 28px rgba(0,0,0,.28);
+    opacity: 0; animation: fadeUp .5s ease forwards .64s;
+  }
+  .chart-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+  .chart-title {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px;
+    text-transform: uppercase; color: var(--white); line-height: 1.2;
+  }
+  .chart-subtitle { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+  .chart-source { font-size: 10px; color: var(--ch4); text-align: right; max-width: 220px; line-height: 1.4; }
+
+  /* Bar chart rows */
+  .chart-bars { margin-top: 20px; display: flex; flex-direction: column; gap: 14px; }
+
+  .bar-row { display: grid; grid-template-columns: 130px 1fr 54px; align-items: center; gap: 10px; }
+  .bar-label { font-size: 12px; color: #9aa5bc; line-height: 1.3; text-align: right; padding-right: 4px; }
+  .bar-label strong { display: block; font-size: 13px; color: var(--white); font-weight: 600; }
+  .bar-track { position: relative; height: 28px; background: rgba(255,255,255,.04); border-radius: 4px; overflow: visible; }
+  .bar-fill {
+    position: absolute; left: 0; top: 0; height: 100%;
+    border-radius: 4px;
+    transition: width 1.2s cubic-bezier(.23,1,.32,1);
+    width: 0;
+  }
+  .bar-fill.is-you {
+    box-shadow: 0 0 12px var(--tglow);
+  }
+  /* baseline tick at 1.00 */
+  .bar-track::after {
+    content: '1.00'; position: absolute;
+    left: var(--baseline-pct);
+    top: 0; bottom: 0;
+    width: 1px; background: rgba(255,255,255,.18);
+    font-size: 9px; color: var(--muted);
+    display: flex; align-items: flex-end; padding-bottom: 2px;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .bar-val { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; color: var(--ta2); }
+  .bar-val.is-you { font-size: 18px; }
+
+  /* you-tag */
+  .you-tag {
+    display: inline-block; font-size: 9px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    background: var(--ta); color: #fff;
+    padding: 2px 6px; border-radius: 3px; margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  /* legend */
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--ch3); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* benchmark line label */
+  .benchmark-label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--muted); margin-top: 10px;
+  }
+  .benchmark-label::before { content: ''; display: inline-block; width: 16px; height: 1px; background: rgba(255,255,255,.25); }
+
+  /* ── Stats ─────────────────────────────────────────────────── */
+  .stat-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(175px,1fr));
+    gap: 12px; margin-bottom: 28px;
+    opacity: 0; animation: fadeUp .5s ease forwards .72s;
+  }
+  .stat-card { background: var(--ch2); border: 1px solid var(--ch3); border-radius: 10px; padding: 16px 18px; box-shadow: 0 4px 20px rgba(0,0,0,.22); }
+  .s-lbl { font-size: 10px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .s-val { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 30px; color: var(--ta2); line-height: 1; margin-bottom: 4px; }
+  .s-desc { font-size: 11px; color: var(--muted); line-height: 1.45; }
+
+  /* ── Trust strip ───────────────────────────────────────────── */
+  .trust-strip {
+    background: var(--ch2); border: 1px solid var(--ch3); border-radius: 10px;
+    padding: 16px 20px; margin-bottom: 28px;
+    display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center; justify-content: center;
+    opacity: 0; animation: fadeUp .5s ease forwards .8s;
+  }
+  .trust-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+  .trust-item strong { color: var(--white); font-weight: 600; }
+  .tsep { color: var(--ch4); }
+
+  /* ── Rule ──────────────────────────────────────────────────── */
+  .rule { height: 1px; background: linear-gradient(90deg,transparent,var(--ch3) 25%,var(--ch3) 75%,transparent); margin: 28px 0; }
+  .sec-label { font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--ta2); margin-bottom: 6px; }
+  .sec-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 26px; text-transform: uppercase; color: var(--white); margin-bottom: 16px; }
+
+  /* ── Checklist ─────────────────────────────────────────────── */
+  .review-list {
+    list-style: none; display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+    gap: 10px; margin-bottom: 36px;
+    opacity: 0; animation: fadeUp .5s ease forwards .88s;
+  }
+  .review-list li {
+    background: var(--ch2); border: 1px solid var(--ch3); border-left: 3px solid var(--ta);
+    border-radius: 8px; padding: 13px 15px; font-size: 13.5px; color: #9aa5bc;
+    display: flex; gap: 10px; align-items: flex-start; line-height: 1.5;
+  }
+  .review-list li .ico { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── CTA ───────────────────────────────────────────────────── */
+  .cta-block {
+    background: linear-gradient(140deg,var(--ch2),var(--ch3)); border: 1px solid var(--ta);
+    border-radius: 14px; padding: 40px 32px; text-align: center;
+    box-shadow: 0 8px 48px var(--tglow); position: relative; overflow: hidden;
+    margin-bottom: 32px;
+    opacity: 0; animation: fadeUp .5s ease forwards .96s;
+  }
+  .cta-block::before {
+    content: ''; position: absolute; top: -35%; left: 50%; transform: translateX(-50%);
+    width: 340px; height: 340px;
+    background: radial-gradient(circle,var(--tglow) 0%,transparent 68%);
+    pointer-events: none;
+  }
+  .cta-block h2 {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: clamp(24px,4vw,40px); text-transform: uppercase; line-height: 1.1;
+    color: var(--white); margin-bottom: 12px; position: relative;
+  }
+  .cta-block p { font-size: 15px; color: #9aa5bc; line-height: 1.65; max-width: 500px; margin: 0 auto 26px; position: relative; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--ta); color: #fff;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px;
+    letter-spacing: .08em; text-transform: uppercase; text-decoration: none;
+    padding: 15px 34px; border-radius: 7px;
+    transition: transform .15s, box-shadow .15s, background .15s;
+    box-shadow: 0 4px 20px var(--tglow); position: relative;
+  }
+  .btn:hover { background: var(--ta2); transform: translateY(-2px); box-shadow: 0 8px 32px var(--tglow); }
+  .btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+  .cta-reassure { margin-top: 14px; font-size: 12px; color: var(--muted); position: relative; }
+
+  /* ── Producer card (Daniel) ────────────────────────────────── */
+  .producer-footer {
+    border-top: 1px solid var(--ch3); padding-top: 28px;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp .5s ease forwards 1.04s;
+  }
+  .prod-avatar {
+    width: 52px; height: 52px; background: var(--ch3); border: 2px solid var(--ta);
+    border-radius: 50%; display: grid; place-items: center;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px;
+    color: var(--ta2); flex-shrink: 0;
+  }
+  .prod-info { flex: 1; min-width: 180px; }
+  .prod-name { font-weight: 600; font-size: 15px; color: var(--white); margin-bottom: 2px; }
+  .prod-title { font-size: 12px; color: var(--muted); }
+  .prod-contact { font-size: 13px; color: var(--muted); margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .prod-contact a { color: var(--ta2); text-decoration: none; }
+  .prod-contact a:hover { text-decoration: underline; }
+
+  /* ── Site footer ───────────────────────────────────────────── */
+  .site-footer {
+    margin-top: 48px; border-top: 1px solid var(--ch3); padding: 28px 28px 20px;
+    display: flex; flex-wrap: wrap; gap: 20px 36px; align-items: flex-start; justify-content: space-between;
+    opacity: 0; animation: fadeUp .5s ease forwards 1.1s;
+  }
+  .sf-logo img { height: 26px; width: auto; opacity: .7; }
+  .sf-logo .sf-fb { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; display: none; }
+  .sf-addr { font-size: 12px; color: var(--muted); line-height: 1.75; }
+  .sf-addr a { color: var(--ta2); text-decoration: none; }
+  .sf-addr a:hover { text-decoration: underline; }
+  .sf-links { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  .sf-links a { font-size: 11px; color: var(--muted); text-decoration: none; }
+  .sf-links a:hover { color: var(--white); }
+  .sf-copy { width: 100%; font-size: 11px; color: var(--ch4); border-top: 1px solid var(--ch3); padding-top: 14px; margin-top: 4px; }
+
+  /* ── Preview notice ────────────────────────────────────────── */
+  .preview-notice { background: var(--ch2); border: 1px dashed var(--ch4); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: var(--muted); margin: 16px 28px 0; display: none; }
+  .preview-notice code { font-size: 11px; color: var(--ta2); }
+
+  /* ── Animations ────────────────────────────────────────────── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── Responsive ────────────────────────────────────────────── */
+  @media(max-width:580px){
+    .topbar{padding:14px 18px;height:auto}
+    .topbar-cta{display:none}
+    .hero,.content{padding-left:18px;padding-right:18px}
+    .xmod-card{min-width:100%}
+    .cta-block{padding:28px 18px}
+    .btn{width:100%;justify-content:center}
+    .site-footer{padding:22px 18px 16px}
+    .preview-notice{margin:12px 18px 0}
+    .bar-row{grid-template-columns:90px 1fr 48px}
+    .bar-label{font-size:11px}
+    .chart-source{display:none}
+  }
+
+  /* ── Tier overrides ────────────────────────────────────────── */
+  body.tier-1{--ta:#b83228;--ta2:#e04438;--tglow:rgba(184,50,40,.25);--tbg:rgba(184,50,40,.12)}
+  body.tier-2{--ta:#3d6b9e;--ta2:#5189c4;--tglow:rgba(61,107,158,.25);--tbg:rgba(61,107,158,.12)}
+  body.tier-3{--ta:#1a7a56;--ta2:#24a876;--tglow:rgba(26,122,86,.25);--tbg:rgba(26,122,86,.12)}
+
+  /* ── Contact form ──────────────────────────────────────────── */
+  .contact-form {
+    margin-top: 20px; position: relative;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .contact-form .full { grid-column: 1 / -1; }
+  .form-field { display: flex; flex-direction: column; gap: 5px; }
+  .form-field label {
+    font-size: 11px; font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .form-field input,
+  .form-field textarea {
+    background: rgba(255,255,255,.06);
+    border: 1px solid var(--ch3);
+    border-radius: 7px;
+    padding: 11px 14px;
+    font-family: 'Barlow', sans-serif; font-size: 14px;
+    color: var(--white);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    resize: none;
+    width: 100%;
+  }
+  .form-field input::placeholder,
+  .form-field textarea::placeholder { color: var(--ch4); }
+  .form-field input:focus,
+  .form-field textarea:focus {
+    border-color: var(--ta);
+    box-shadow: 0 0 0 3px var(--tbg);
+  }
+  .form-field textarea { height: 80px; }
+
+  .form-divider {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 11px; color: var(--ch4); margin: 4px 0;
+  }
+  .form-divider::before, .form-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--ch3);
+  }
+
+  .btn-submit {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--ta); color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 17px; letter-spacing: .08em; text-transform: uppercase;
+    padding: 15px 34px; border-radius: 7px; border: none; cursor: pointer;
+    transition: transform .15s, box-shadow .15s, background .15s;
+    box-shadow: 0 4px 20px var(--tglow);
+  }
+  .btn-submit:hover { background: var(--ta2); transform: translateY(-2px); box-shadow: 0 8px 32px var(--tglow); }
+  .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+  .btn-submit svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+  .btn-phone {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: transparent; color: var(--ta2);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 16px; letter-spacing: .06em; text-transform: uppercase;
+    padding: 13px 34px; border-radius: 7px;
+    border: 1px solid var(--ta);
+    text-decoration: none;
+    transition: background .15s, color .15s;
+  }
+  .btn-phone:hover { background: var(--tbg); color: var(--white); }
+  .btn-phone svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+  @media(max-width:520px){
+    .contact-form { grid-template-columns: 1fr; }
+    .contact-form .full { grid-column: 1; }
+    .btn-submit, .btn-phone { grid-column: 1; }
+  }
+
+  /* ── Toast notification ────────────────────────────────────── */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--ch2); border: 1px solid var(--ta);
+    border-radius: 10px; padding: 14px 22px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    font-size: 14px; color: var(--white);
+    z-index: 9999; max-width: 420px; width: calc(100% - 48px);
+    transition: transform .4s cubic-bezier(.23,1,.32,1), opacity .4s;
+    opacity: 0; pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+  .toast-icon { font-size: 20px; flex-shrink: 0; }
+  .toast-text { flex: 1; line-height: 1.4; }
+  .toast-text strong { color: var(--ta2); display: block; margin-bottom: 2px; }
+  .toast.error { border-color: #e04438; }
+  .toast.error .toast-text strong { color: #e04438; }
+
+  /* ── Visit ping indicator (subtle, top-right) ──────────────── */
+  .visit-ping {
+    position: fixed; top: 80px; right: 18px; z-index: 9998;
+    background: var(--ch2); border: 1px solid var(--ch3);
+    border-radius: 8px; padding: 8px 12px;
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+    opacity: 0; transition: opacity .4s;
+    pointer-events: none;
+  }
+  .visit-ping.show { opacity: 1; }
+  .visit-ping .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ta2); animation: pulse 2s ease infinite; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <a href="https://drapersmith.com" target="_blank" rel="noopener" class="topbar-logo">
+      <img src="https://drapersmith.com/wp-content/themes/sckingsburg/images/draper-smith-logo.png"
+           alt="Draper Smith Insurance Group"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span class="logo-fb">Draper Smith Insurance Group</span>
+    </a>
+    <div class="topbar-right">
+      <a href="tel:5597262423" class="topbar-phone">559-726-2423</a>
+      <a href="https://drapersmith.com/get-a-proposal/" target="_blank" rel="noopener" class="topbar-cta">Get a Proposal</a>
+    </div>
+  </div>
+
+  <div class="preview-notice" id="previewNotice">
+    ⚙️ <strong>Preview mode</strong> — no URL params found. Append
+    <code>?first=Jane&amp;last=Smith&amp;company=Acme+Farms&amp;xmod=1.22&amp;premium=84000&amp;reviews=47</code>
+    to personalize. The <code>reviews</code> param is the prospect's Google review count and determines peer size bucket.
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="tier-badge" id="tierBadge"> </div>
+    <div class="prospect-label" id="prospectLabel"> </div>
+    <h1 id="headline">Your Workers' Comp Review</h1>
+    <p class="subhead" id="subhead">We pulled your experience modifier. Here's what it means — and how you compare to similar businesses in the Central Valley.</p>
+  </div>
+
+  <div class="content">
+
+    <!-- X-mod summary -->
+    <div class="xmod-summary">
+      <div class="xmod-card">
+        <div class="xmod-lbl">Your X-Mod</div>
+        <div class="xmod-num" id="xmodVal">—</div>
+        <div class="xmod-ctx" id="xmodCtx">CA industry baseline = 1.00</div>
+      </div>
+      <div class="xmod-meaning" id="xmodMeaning"> </div>
+    </div>
+
+    <!-- Peer comparison chart -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title" id="chartTitle">How You Compare to Similar Businesses</div>
+          <div class="chart-subtitle" id="chartSubtitle">Central Valley employers in your size tier — X-mod distribution</div>
+        </div>
+        <div class="chart-source">Source: WCIRB California experience rating data &amp; regional industry benchmarks. Peer mods are representative of the local employer distribution for this size tier.</div>
+      </div>
+      <div class="chart-bars" id="chartBars"></div>
+      <div class="benchmark-label">Industry baseline (1.00) — where all businesses start before claims history is applied</div>
+      <div class="chart-legend" id="chartLegend"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-row" id="statRow"></div>
+
+    <!-- Trust strip -->
+    <div class="trust-strip">
+      <div class="trust-item"><strong>Serving the Valley Since 1948</strong></div>
+      <span class="tsep">·</span>
+      <div class="trust-item">Independent &amp; Locally Owned</div>
+      <span class="tsep">·</span>
+      <div class="trust-item">Kingsburg · Fresno · Selma · Hanford · Dinuba · Visalia</div>
+    </div>
+
+    <div class="rule"></div>
+    <div class="sec-label">What's Included</div>
+    <div class="sec-title">Your No-Cost Analysis Covers</div>
+    <ul class="review-list" id="reviewList"></ul>
+
+    <!-- CTA + Contact Form -->
+    <div class="cta-block">
+      <h2 id="ctaHead">Let's Talk</h2>
+      <p id="ctaBody">Leave your info and Daniel will reach out within one business day — or call him directly right now.</p>
+
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="form-field">
+          <label for="cf-name">Your Name</label>
+          <input type="text" id="cf-name" name="cf_name" placeholder="Jane Smith" autocomplete="name" required>
+        </div>
+        <div class="form-field">
+          <label for="cf-phone">Best Phone</label>
+          <input type="tel" id="cf-phone" name="cf_phone" placeholder="559-555-0100" autocomplete="tel">
+        </div>
+        <div class="form-field full">
+          <label for="cf-email">Email Address</label>
+          <input type="email" id="cf-email" name="cf_email" placeholder="jane@acmepacking.com" autocomplete="email">
+        </div>
+        <div class="form-field full">
+          <label for="cf-message">Anything you'd like Daniel to know? <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <textarea id="cf-message" name="cf_message" placeholder="e.g. Best time to call, specific questions about our mod, renewal date coming up..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          <span id="submitBtnTxt">Send Request to Daniel</span>
+        </button>
+
+        <div class="form-divider">or reach him directly</div>
+
+        <a href="tel:5597262423" class="btn-phone">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+          </svg>
+          Call Daniel Direct — 559-726-2423
+        </a>
+      </form>
+
+      <div class="cta-reassure" id="ctaReassure">No cost · No commitment · Daniel responds within 1 business day</div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast" role="alert">
+      <span class="toast-icon" id="toastIcon">✓</span>
+      <div class="toast-text">
+        <strong id="toastTitle">Request sent!</strong>
+        <span id="toastMsg">Daniel will be in touch within one business day.</span>
+      </div>
+    </div>
+
+    <!-- Visit ping indicator -->
+    <div class="visit-ping" id="visitPing">
+      <span class="dot"></span>
+      <span>Your advisor has been notified</span>
+    </div>
+
+    <!-- Producer — Daniel Samarin (hardcoded) -->
+    <div class="producer-footer">
+      <div class="prod-avatar">DS</div>
+      <div class="prod-info">
+        <div class="prod-name">Daniel Samarin</div>
+        <div class="prod-title">Commercial Insurance Advisor · Draper Smith Insurance Group · Kingsburg, CA</div>
+        <div class="prod-contact">
+          <a href="tel:5597262423">559-726-2423 direct</a>
+          <a href="/cdn-cgi/l/email-protection#84c0e5eaede1e8c4e0f6e5f4e1f6f7e9edf0ecaae7ebe9"><span class="__cf_email__" data-cfemail="9cd8fdf2f5f9f0dcf8eefdecf9eeeff1f5e8f4b2fff3f1">[email&#160;protected]</span></a>
+          <a href="https://drapersmith.com/workers-comp-insurance/" target="_blank" rel="noopener">drapersmith.com</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Site footer -->
+  <div class="site-footer">
+    <div class="sf-logo">
+      <img src="https://drapersmith.com/wp-content/uploads/2024/12/site-logo-large.png"
+           alt="Draper Smith Insurance Group"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span class="sf-fb">Draper Smith Insurance Group</span>
+    </div>
+    <div class="sf-addr">
+      1398 Smith St, Kingsburg, CA 93631<br>
+      Main: <a href="tel:5598975811">559-897-5811</a> &nbsp;·&nbsp; Fax: 559-896-0829<br>
+      Daniel direct: <a href="tel:5597262423">559-726-2423</a> &nbsp;·&nbsp;
+      <a href="/cdn-cgi/l/email-protection#5511343b3c30391531273425302726383c213d7b363a38"><span class="__cf_email__" data-cfemail="9dd9fcf3f4f8f1ddf9effcedf8efeef0f4e9f5b3fef2f0">[email&#160;protected]</span></a>
+    </div>
+    <div class="sf-links">
+      <a href="https://drapersmith.com/" target="_blank" rel="noopener">Home</a>
+      <a href="https://drapersmith.com/about-us/" target="_blank" rel="noopener">About Us</a>
+      <a href="https://drapersmith.com/workers-comp-insurance/" target="_blank" rel="noopener">Workers' Comp</a>
+      <a href="https://drapersmith.com/get-a-proposal/" target="_blank" rel="noopener">Get a Proposal</a>
+      <a href="https://drapersmith.com/contact-us/" target="_blank" rel="noopener">Contact</a>
+      <a href="https://drapersmith.com/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>
+      <a href="https://portal.csr24.com/mvc/1705533824" target="_blank" rel="noopener">Client Login</a>
+    </div>
+    <div class="sf-copy">© 2026 Draper Smith Insurance Group · 1398 Smith St, Kingsburg, CA 93631 · All Rights Reserved.</div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   NTFY.SH CONFIGURATION
+   Replace NTFY_TOPIC with your chosen topic name (step 4 above)
+   ════════════════════════════════════════════════════════════════ */
+const NTFY_TOPIC = 'YOUR-TOPIC-NAME-HERE';   // ← only thing you need to change
+
+(function () {
+
+  /* ── ntfy send helper ──────────────────────────────────────────
+     Sends a push notification to your phone via ntfy.sh.
+     title   = bold first line on the notification
+     body    = detail text
+     tags    = emoji tags shown on the notification (ntfy feature)
+     priority= 1 (min) – 5 (max). 4 = high, shows as urgent on phone
+  ───────────────────────────────────────────────────────────────── */
+  function ntfyPush(title, body, tags = 'bell', priority = 3) {
+    fetch('https://ntfy.sh/' + NTFY_TOPIC, {
+      method:  'POST',
+      headers: {
+        'Title':    title,
+        'Tags':     tags,
+        'Priority': String(priority),
+        'Content-Type': 'text/plain',
+      },
+      body: body,
+    }).catch(() => { /* silent fail — never interrupts the prospect's experience */ });
+  }
+
+  /* ── Parse URL params ──────────────────────────────────────── */
+  const p       = new URLSearchParams(window.location.search);
+  const first   = p.get('first')    || 'Valued Prospect';
+  const last    = p.get('last')     || '';
+  const company = p.get('company')  || 'Your Business';
+  const xmodRaw = parseFloat(p.get('xmod'))    || 1.00;
+  const premium = parseFloat(p.get('premium')) || 0;
+  const reviews = parseInt(p.get('reviews'))   || 25;
+  const cal     = p.get('cal')      || '';
+
+  if (!p.has('xmod') && !p.has('first') && !p.has('company')) {
+    document.getElementById('previewNotice').style.display = 'block';
+  }
+
+  const xmod      = Math.round(xmodRaw * 100) / 100;
+  const tier      = xmod > 1.10 ? 1 : xmod < 0.90 ? 3 : 2;
+  const tierLabel = tier === 1 ? 'Tier 1 — High Mod' : tier === 2 ? 'Tier 2 — Baseline' : 'Tier 3 — Credit';
+  const fullName  = [first, last].filter(Boolean).join(' ');
+  const now       = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit', hour12: true });
+  const device    = /Mobi|Android/i.test(navigator.userAgent) ? '📱 Mobile' : '🖥 Desktop';
+
+  document.body.classList.add('tier-' + tier);
+
+  /* ── 1. VISIT NOTIFICATION — fires on page load ────────────── */
+  if (p.has('xmod') || p.has('company') || p.has('first')) {
+    const tierEmoji = tier === 1 ? '🔴' : tier === 2 ? '🔵' : '🟢';
+    ntfyPush(
+      /* title    */ `${tierEmoji} ${company} opened their page`,
+      /* body     */ [
+        `Who:     ${fullName}`,
+        `Company: ${company}`,
+        `X-Mod:   ${xmod.toFixed(2)}  (${tierLabel})`,
+        premium > 0 ? `Premium: $${premium.toLocaleString()}` : `Premium: Not provided`,
+        `Device:  ${device}`,
+        `Time:    ${now} PT`,
+      ].join('\n'),
+      /* tags     */ tier === 1 ? 'rotating_light' : tier === 3 ? 'white_check_mark' : 'bell',
+      /* priority */ tier === 1 ? 4 : 3   // high priority for Tier 1 (high mod) prospects
+    );
+
+    // Show subtle on-page ping for the prospect
+    const ping = document.getElementById('visitPing');
+    if (ping) {
+      ping.classList.add('show');
+      setTimeout(() => ping.classList.remove('show'), 4000);
+    }
+  }
+
+  /* ── 2. TOAST HELPER ───────────────────────────────────────── */
+  function showToast(title, msg, isError = false) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastTitle').textContent = title;
+    document.getElementById('toastMsg').textContent   = msg;
+    document.getElementById('toastIcon').textContent  = isError ? '✕' : '✓';
+    toast.classList.toggle('error', isError);
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 5000);
+  }
+
+  /* ── 3. CONTACT FORM SUBMISSION ────────────────────────────── */
+  document.getElementById('contactForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const nameVal  = document.getElementById('cf-name').value.trim();
+    const phoneVal = document.getElementById('cf-phone').value.trim();
+    const emailVal = document.getElementById('cf-email').value.trim();
+    const msgVal   = document.getElementById('cf-message').value.trim();
+
+    if (!nameVal) {
+      document.getElementById('cf-name').focus();
+      showToast('Name required', 'Please enter your name so Daniel knows who to contact.', true);
+      return;
+    }
+    if (!phoneVal && !emailVal) {
+      document.getElementById('cf-phone').focus();
+      showToast('Contact info needed', 'Please enter a phone number or email so Daniel can reach you.', true);
+      return;
+    }
+
+    const btn    = document.getElementById('submitBtn');
+    const btnTxt = document.getElementById('submitBtnTxt');
+    btn.disabled = true;
+    btnTxt.textContent = 'Sending…';
+
+    const contactTime = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit', hour12: true });
+
+    ntfyPush(
+      /* title    */ `📋 Contact request — ${company}`,
+      /* body     */ [
+        `Name:    ${nameVal}`,
+        `Company: ${company}`,
+        phoneVal  ? `Phone:   ${phoneVal}` : null,
+        emailVal  ? `Email:   ${emailVal}` : null,
+        msgVal    ? `Message: ${msgVal}`   : null,
+        `X-Mod:   ${xmod.toFixed(2)}  (${tierLabel})`,
+        premium > 0 ? `Premium: $${premium.toLocaleString()}` : null,
+        `Time:    ${contactTime} PT`,
+      ].filter(Boolean).join('\n'),
+      /* tags     */ 'phone,memo',
+      /* priority */ 4   // always high priority — someone wants a callback
+    );
+
+    // Give ntfy a moment then show confirmation
+    setTimeout(() => {
+      showToast('Request sent to Daniel!', 'He\'ll be in touch within one business day — usually same day.');
+      document.getElementById('contactForm').reset();
+      // Re-fill name since we cleared the form
+      document.getElementById('cf-name').value = nameVal;
+      btnTxt.textContent = '✓ Request Sent';
+      btn.disabled = false;
+      setTimeout(() => { btnTxt.textContent = 'Send Request to Daniel'; }, 6000);
+    }, 600);
+  });
+
+  /* ── 4. Pre-fill name from URL params ──────────────────────── */
+  if (first !== 'Valued Prospect') {
+    document.getElementById('cf-name').value = fullName;
+  }
+
+  /* ── Peer chart & size bucket ──────────────────────────────── */
+  let bucket;
+  if      (reviews < 15)  bucket = 'micro';
+  else if (reviews < 50)  bucket = 'small';
+  else if (reviews < 150) bucket = 'medium';
+  else                    bucket = 'large';
+
+  const PEER_DATA = {
+    micro: {
+      label: 'Micro businesses (under 15 Google reviews)',
+      desc:  'Typically 1–15 employees · Est. $11k–$45k annual WC premium',
+      peers: [
+        { name: 'Valley Peer A', mod: 1.38, note: 'Above avg — 2 open claims' },
+        { name: 'Valley Peer B', mod: 1.19, note: 'Moderate surcharge' },
+        { name: 'CA Micro Avg',  mod: 1.08, note: 'Statewide micro-employer average', isAvg: true },
+        { name: 'Valley Peer C', mod: 0.97, note: 'Near baseline' },
+        { name: 'Valley Peer D', mod: 0.82, note: 'Strong credit modifier' },
+      ]
+    },
+    small: {
+      label: 'Small businesses (15–49 Google reviews)',
+      desc:  'Typically 10–49 employees · Est. $30k–$180k annual WC premium',
+      peers: [
+        { name: 'Valley Peer A', mod: 1.31, note: 'High frequency of small claims' },
+        { name: 'Valley Peer B', mod: 1.14, note: 'Slightly above baseline' },
+        { name: 'CA Small Avg',  mod: 1.04, note: 'Statewide small-employer average', isAvg: true },
+        { name: 'Valley Peer C', mod: 0.94, note: 'Modest credit' },
+        { name: 'Valley Peer D', mod: 0.78, note: 'Excellent safety record' },
+      ]
+    },
+    medium: {
+      label: 'Mid-size businesses (50–149 Google reviews)',
+      desc:  'Typically 50–200 employees · Est. $120k–$600k annual WC premium',
+      peers: [
+        { name: 'Valley Peer A', mod: 1.25, note: 'Elevated severity in 2022–23' },
+        { name: 'Valley Peer B', mod: 1.11, note: 'Trending toward baseline' },
+        { name: 'CA Mid-Size Avg', mod: 1.02, note: 'Statewide mid-size average', isAvg: true },
+        { name: 'Valley Peer C', mod: 0.91, note: 'Credit territory' },
+        { name: 'Valley Peer D', mod: 0.74, note: 'Top-quartile safety performance' },
+      ]
+    },
+    large: {
+      label: 'Larger businesses (150+ Google reviews)',
+      desc:  'Typically 200+ employees · Est. $500k+ annual WC premium',
+      peers: [
+        { name: 'Valley Peer A', mod: 1.22, note: 'Active litigation on 3 claims' },
+        { name: 'Valley Peer B', mod: 1.08, note: 'Slight debit modifier' },
+        { name: 'CA Large Avg',  mod: 1.01, note: 'Statewide large-employer average', isAvg: true },
+        { name: 'Valley Peer C', mod: 0.88, note: 'Credit — strong RTW program' },
+        { name: 'Valley Peer D', mod: 0.72, note: 'Best-in-class — 5 claim-free years' },
+      ]
+    },
+  };
+
+  const peerSet    = PEER_DATA[bucket];
+  const youEntry   = { name: company !== 'Your Business' ? company : (first !== 'Valued Prospect' ? fullName : 'You'), mod: xmod, isYou: true };
+  const allEntries = [...peerSet.peers, youEntry].sort((a, b) => b.mod - a.mod);
+
+  const chartMin    = 0.60;
+  const chartMax    = Math.max(1.55, Math.max(...allEntries.map(e => e.mod)) + 0.10);
+  const range       = chartMax - chartMin;
+  const baselinePct = ((1.00 - chartMin) / range * 100).toFixed(1) + '%';
+
+  const COLOR_YOU_T1 = '#e04438';
+  const COLOR_YOU_T2 = '#5189c4';
+  const COLOR_YOU_T3 = '#24a876';
+  const COLOR_AVG    = 'rgba(255,255,255,0.18)';
+  const COLOR_HIGH   = 'rgba(224,68,56,0.45)';
+  const COLOR_LOW    = 'rgba(36,168,118,0.35)';
+  const COLOR_MID    = 'rgba(81,137,196,0.30)';
+  const tierColors   = { 1: COLOR_YOU_T1, 2: COLOR_YOU_T2, 3: COLOR_YOU_T3 };
+
+  function barColor(e) {
+    if (e.isYou)      return tierColors[tier];
+    if (e.isAvg)      return COLOR_AVG;
+    if (e.mod > 1.10) return COLOR_HIGH;
+    if (e.mod < 0.90) return COLOR_LOW;
+    return COLOR_MID;
+  }
+
+  document.getElementById('chartTitle').textContent    = `How ${company !== 'Your Business' ? company : 'You'} Compare to Similar Businesses`;
+  document.getElementById('chartSubtitle').textContent = peerSet.label + ' — ' + peerSet.desc;
+
+  const barsEl = document.getElementById('chartBars');
+  allEntries.forEach(entry => {
+    const pct  = ((entry.mod - chartMin) / range * 100).toFixed(1);
+    const row  = document.createElement('div'); row.className = 'bar-row';
+    const lbl  = document.createElement('div'); lbl.className = 'bar-label';
+    if (entry.isYou)      lbl.innerHTML = `<strong>${entry.name} <span class="you-tag">YOU</span></strong>`;
+    else if (entry.isAvg) lbl.innerHTML = `<strong>${entry.name}</strong>`;
+    else                  lbl.innerHTML = `${entry.name}${entry.note ? '<br><span style="font-size:10px;color:var(--ch4)">' + entry.note + '</span>' : ''}`;
+
+    const track = document.createElement('div');
+    track.className = 'bar-track';
+    track.style.setProperty('--baseline-pct', baselinePct);
+    const fill = document.createElement('div');
+    fill.className = 'bar-fill' + (entry.isYou ? ' is-you' : '');
+    fill.style.background = barColor(entry);
+    fill.style.width = '0%';
+    track.appendChild(fill);
+
+    const val = document.createElement('div');
+    val.className = 'bar-val' + (entry.isYou ? ' is-you' : '');
+    val.style.color = entry.isYou ? tierColors[tier] : entry.isAvg ? 'var(--muted)' : entry.mod > 1.10 ? '#e04438' : entry.mod < 0.90 ? '#24a876' : 'var(--muted)';
+    val.textContent = entry.mod.toFixed(2);
+
+    row.appendChild(lbl); row.appendChild(track); row.appendChild(val);
+    barsEl.appendChild(row);
+    setTimeout(() => { fill.style.width = pct + '%'; }, 300);
+  });
+
+  const legendEl = document.getElementById('chartLegend');
+  [
+    { color: tierColors[tier], label: 'Your modifier' },
+    { color: COLOR_AVG,        label: 'CA statewide average' },
+    { color: COLOR_HIGH,       label: 'Above 1.10 (surcharge territory)' },
+    { color: COLOR_MID,        label: '0.90–1.10 (near baseline)' },
+    { color: COLOR_LOW,        label: 'Below 0.90 (credit territory)' },
+  ].forEach(item => {
+    const li = document.createElement('div'); li.className = 'legend-item';
+    li.innerHTML = `<span class="legend-dot" style="background:${item.color}"></span>${item.label}`;
+    legendEl.appendChild(li);
+  });
+
+  /* ── Stats ─────────────────────────────────────────────────── */
+  function buildStats(xmod, premium, tier) {
+    const out = [], diff = xmod - 1.00;
+    if (premium > 0) {
+      const impact = Math.abs(Math.round(premium * diff));
+      out.push({ l: tier === 1 ? 'Annual Surcharge' : tier === 3 ? 'Annual Credit' : 'Mod Impact', v: (diff >= 0 ? '+' : '-') + '$' + impact.toLocaleString(), d: 'vs. a 1.00 baseline modifier at your estimated premium' });
+      if (tier === 1) {
+        out.push({ l: 'Savings per 0.10 Reduction', v: '~$' + Math.round(premium * .10).toLocaleString(), d: 'each tenth of a point reduces your annual premium directly' });
+        const tgt = Math.max(1.00, xmod - .20);
+        out.push({ l: '2-Year Target Savings', v: '$' + Math.round(premium * (xmod - tgt)).toLocaleString() + '+', d: `estimated savings if modifier moves to ~${tgt.toFixed(2)}` });
+      } else if (tier === 2) {
+        out.push({ l: 'Credit-Tier Gap', v: '$' + Math.round(premium * (xmod - .90)).toLocaleString(), d: 'added savings if modifier drops below 0.90' });
+      } else {
+        out.push({ l: 'Stack Potential', v: '~$' + Math.round(premium * (xmod - .80)).toLocaleString(), d: 'possible added savings via schedule credits & dividend programs' });
+      }
+    }
+    const rank = allEntries.filter(e => !e.isYou && e.mod > xmod).length + 1;
+    out.push({ l: 'Your Peer Rank', v: `#${rank} of ${allEntries.length}`, d: `ranked by modifier (lower is better) vs. ${allEntries.length - 1} size-matched Valley peers` });
+    out.push({ l: 'Experience Period', v: '3 Years', d: 'CA mod reflects your last 3 full policy years of claims data' });
+    return out;
+  }
+
+  /* ── Content map ───────────────────────────────────────────── */
+  const T = {
+    1: {
+      badge:   '⚠ High Modifier — Immediate Opportunity',
+      h1:      ['Your X-Mod Is', 'Costing You'],
+      subhead: `An X-mod above 1.10 applies a direct surcharge to every dollar of your workers' comp base rate. The chart below shows where you stand against size-matched Valley employers — and the gap to close.`,
+      ctx:     'Above the CA industry baseline',
+      meaning: `Your modifier of <strong>${xmod.toFixed(2)}</strong> triggers a <strong>premium surcharge</strong>. California employers above 1.10 frequently have recoverable dollars through claims management, unit stat corrections, and return-to-work programs. Daniel Samarin can show you exactly where yours are.`,
+      review:  [
+        { i: '🔎', t: 'Line-by-line claims audit for reserve errors and charges eligible for contest' },
+        { i: '📋', t: 'Unit Statistical Report review — incorrect codes inflate your mod for 3 years' },
+        { i: '🛡️', t: 'Loss-control action plan tailored to your industry and class codes' },
+        { i: '🏥', t: 'Return-to-work program design to reduce claim severity and duration' },
+        { i: '💰', t: 'Competitive re-shop across our admitted and E&S carrier panel' },
+        { i: '📅', t: 'Mod reduction roadmap with projected annual premium savings' },
+      ],
+      ctaHead:  "Let's Fix That Modifier",
+      ctaBody:  `Leave your contact info below and Daniel Samarin will reach out within one business day — or call him directly now.`,
+      reassure: 'No cost · No commitment · Daniel responds within 1 business day',
+    },
+    2: {
+      badge:   '✓ At-Market Modifier — Protect Your Position',
+      h1:      ['Your Mod Is', 'Right on the Line'],
+      subhead: `An X-mod between 0.90 and 1.10 sits near the California baseline. The chart shows how you compare to size-matched peers — and what it takes to push into credit territory.`,
+      ctx:     'Near the CA industry baseline (1.00)',
+      meaning: `Your modifier of <strong>${xmod.toFixed(2)}</strong> is in the <strong>neutral zone</strong>. You're paying close to standard rate. The opportunity: proactive strategies now can push you below 0.90 before your next experience period locks in — unlocking a credit modifier and lower premiums.`,
+      review:  [
+        { i: '📊', t: 'Experience period analysis — pinpoint which claims are driving your mod today' },
+        { i: '📋', t: 'Class code accuracy check — misclassifications cost CA employers millions annually' },
+        { i: '📉', t: 'Mod trajectory forecast: what your renewal modifier looks like if trends hold' },
+        { i: '🔒', t: 'Risk profile benchmarking vs. comparable employers in your segment' },
+        { i: '💲', t: 'Dividend program eligibility review and group captive assessment' },
+        { i: '✅', t: 'Proactive safety documentation to protect your rating for the next 3-year window' },
+      ],
+      ctaHead:  'Protect Your Position',
+      ctaBody:  `Leave your contact info below and Daniel Samarin will show you how to build a buffer and chart a path to credit territory.`,
+      reassure: 'No cost · No commitment · Daniel responds within 1 business day',
+    },
+    3: {
+      badge:   '★ Credit Modifier — Your Safety Record Is an Asset',
+      h1:      ['Your Safety Record', 'Earns You More'],
+      subhead: `A modifier below 0.90 is a genuine competitive advantage. The chart shows exactly where you stand against size-matched Valley peers — and where there's still room to stack additional savings.`,
+      ctx:     'Below baseline — credit territory',
+      meaning: `Your modifier of <strong>${xmod.toFixed(2)}</strong> earns a <strong>premium credit</strong> against your base rate. Protecting it matters. Daniel Samarin will verify your class codes are accurate, confirm no reserve errors are lurking, and bring your account to carriers who reward credit-mod employers most aggressively.`,
+      review:  [
+        { i: '🏆', t: 'Competitive re-market — ensure top-tier carriers are bidding on your account' },
+        { i: '📋', t: 'Class code and payroll audit — even credit mods can be undersized by misclassification' },
+        { i: '💰', t: 'Dividend and retro-rating analysis to recover additional premium dollars' },
+        { i: '📊', t: 'Mod stability review — confirm your credit holds through the next experience period' },
+        { i: '🛡️', t: 'Schedule credit optimization using carrier underwriting guidelines' },
+        { i: '📅', t: 'Long-range mod forecast so your CFO can project comp costs with confidence' },
+      ],
+      ctaHead:  "Let's Make Your Credit Work Harder",
+      ctaBody:  `Leave your contact info below and Daniel Samarin will show you which carriers value your modifier most — and where dividend programs can stack additional savings.`,
+      reassure: 'No cost · No commitment · Daniel responds within 1 business day',
+    },
+  };
+
+  const t = T[tier];
+
+  /* ── Inject content ────────────────────────────────────────── */
+  document.getElementById('tierBadge').textContent     = t.badge;
+  document.getElementById('prospectLabel').textContent = company !== 'Your Business'
+    ? `Prepared for ${company}` : `Prepared for ${fullName}`;
+  document.getElementById('xmodVal').textContent       = xmod.toFixed(2);
+  document.getElementById('xmodCtx').textContent       = t.ctx;
+  document.getElementById('xmodMeaning').innerHTML     = t.meaning;
+  document.getElementById('ctaHead').textContent       = t.ctaHead;
+  document.getElementById('ctaBody').textContent       = t.ctaBody;
+  document.getElementById('ctaReassure').textContent   = t.reassure;
+  document.getElementById('headline').innerHTML        = `${t.h1[0]} <em>${t.h1[1]}</em>`;
+  document.getElementById('subhead').textContent       = t.subhead;
+
+  const sr = document.getElementById('statRow');
+  buildStats(xmod, premium, tier).forEach(s => {
+    const d = document.createElement('div'); d.className = 'stat-card';
+    d.innerHTML = `<div class="s-lbl">${s.l}</div><div class="s-val">${s.v}</div><div class="s-desc">${s.d}</div>`;
+    sr.appendChild(d);
+  });
+
+  const rl = document.getElementById('reviewList');
+  t.review.forEach(r => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="ico">${r.i}</span><span>${r.t}</span>`;
+    rl.appendChild(li);
+  });
+
+})();
+</script>
+</body>
+</html>
